@@ -1,0 +1,25 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\TimetableRun;
+use App\Services\TimetableConflictDetector;
+
+class TimetableController extends Controller
+{
+    public function conflicts(int $runId)
+    {
+        $run = TimetableRun::findOrFail($runId);
+
+        // Detect conflicts
+        $report = TimetableConflictDetector::detect($runId);
+
+        return view('timetables.conflicts', [
+            'run' => $run,
+            'teacherConflicts' => $report['teacher_conflicts'] ?? [],
+            'classConflicts' => $report['class_conflicts'] ?? [],
+            'maps' => $report['maps'] ?? [],
+        ]);
+    }
+}
